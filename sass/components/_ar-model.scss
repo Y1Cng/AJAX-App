@@ -1,6 +1,52 @@
   // Customize our own hotspot 
 
+  // 移动端显示的静态图片
+  #mobile-tablet-view {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  // Loading 加载动画样式
+  #loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    margin: 2rem 0;
+
+    svg {
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      stroke: #333;
+      stroke-dasharray: 280;
+      stroke-dashoffset: 0;
+    }
+
+    &.hidden {
+      display: none;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // 错误信息样式
+  .error-message {
+    color: red;
+    font-weight: bold;
+    padding: 1rem;
+    border: 1px solid red;
+    background-color: #ffe6e6;
+    margin-top: 1rem;
+  }
+
   model-viewer {
+    display: none; // 移动端默认隐藏模型
     width: auto;
     max-width: 1200px;
     height: 700px;
@@ -84,7 +130,16 @@
   }
 
   @media screen and (min-width: 768px) {
-      .Hotspot {
-        display: block;
-      }
+    .Hotspot {
+      display: block;
+    }
+
+    // 平板及以上显示模型，隐藏静态图
+    #mobile-tablet-view {
+      display: none;
+    }
+
+    model-viewer {
+      display: block;
+    }
   }
