@@ -1,6 +1,6 @@
 (() => {
-
-  //variables
+  // Variables
+  const model = document.querySelector("#model");
   const hotspots = document.querySelectorAll(".Hotspot");
   const materialTemplate = document.querySelector("#material-template");
   const materialList = document.querySelector("#material-list");
@@ -8,112 +8,92 @@
 
   // API URLs
   const materialBaseUrl = "https://swiftpixel.com/earbud/api/materials";
-  const infoBoxBaseUrl = "https://swiftpixel.com/earbud/api/infoboxes";
 
   // Functions
 
   // Toggle Loader
-  function toggleLoader(show) {
-    if (show) {
+  function toggleLoader(isShowing) {
+    if (isShowing) {
       loader.classList.remove("hidden");
     } else {
       loader.classList.add("hidden");
     }
   }
 
-  // Load Info Boxes
-  function loadInfoBoxes() {
-    fetch(infoBoxBaseUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then(infoBoxes => {
-        infoBoxes.forEach((infoBox, index) => {
-          let selected = document.querySelector(`#hotspot-${index + 1}`);
-          if (selected) {
-            const titleElement = document.createElement('h2');
-            titleElement.textContent = infoBox.heading;
+  // Display Error
+  function displayError(errorMessage) {
+    const errorElement = document.createElement("div");
+    errorElement.classList.add("error-message");
+    errorElement.textContent = errorMessage;
+    materialList.appendChild(errorElement);
+  }
 
-            const textElement = document.createElement('p');
-            textElement.textContent = infoBox.description;
+  // Render Materials
+  function renderMaterials(materials) {
+    materials.forEach(material => {
+      const clone = materialTemplate.content.cloneNode(true);
+      const materialHeading = clone.querySelector(".material-heading");
+      const materialDescription = clone.querySelector(".material-description");
 
-            selected.appendChild(titleElement);
-            selected.appendChild(textElement);
-          }
-        });
-      })
-      .catch(error => {
-        console.error("Error loading info boxes:", error);
-      });
+      materialHeading.textContent = material.heading;
+      materialDescription.textContent = material.description;
+
+      materialList.appendChild(clone);
+    });
+  }
+
+  // Handle Response
+  function handleResponse(response) {
+    if (!response.ok) {
+      throw new Error("Network response was not ok: " + response.statusText);
+    }
+    return response.json();
+  }
+
+  // Handle Data
+  function handleData(data) {
+    toggleLoader(false);
+    renderMaterials(data);
+  }
+
+  // Handle Fetch Error
+  function handleFetchError(error) {
+    console.error("An error occurred:", error);
+    toggleLoader(false);
+    displayError("Unable to load materials. Please check your connection.");
   }
 
   // Load Material Info
   function loadMaterialInfo() {
-    // Show loader before fetching
     toggleLoader(true);
 
     fetch(materialBaseUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Connection error");
-        }
-        return response.json();
-      })
-      .then(materials => {
-        // Populate the list
-        materials.forEach(material => {
-          // Clone the template
-          const clone = materialTemplate.content.cloneNode(true);
-
-          // Populate the cloned template
-          const materialHeading = clone.querySelector(".material-heading");
-          materialHeading.textContent = material.heading;
-
-          const materialDescription = clone.querySelector(".material-description");
-          materialDescription.textContent = material.description;
-
-          // Append to the list
-          materialList.appendChild(clone);
-        });
-
-        // Hide loader after successful load
-        toggleLoader(false);
-      })
-      .catch(error => {
-        console.error("Error loading materials:", error);
-        toggleLoader(false);
-
-        // Show error message to user
-        const errorMessage = document.createElement("p");
-        errorMessage.textContent = "⚠️ Unable to load materials. Please try again later.";
-        errorMessage.classList.add("error-message");
-        materialList.appendChild(errorMessage);
-      });
+      .then(handleResponse)
+      .then(handleData)
+      .catch(handleFetchError);
   }
 
   // Show/Hide Info
   function showInfo() {
-    let selected = document.querySelector(`#${this.slot}`);
+    const selected = document.querySelector(`#${this.slot}`);
     gsap.to(selected, 1, { autoAlpha: 1 });
   }
 
   function hideInfo() {
-    let selected = document.querySelector(`#${this.slot}`);
+    const selected = document.querySelector(`#${this.slot}`);
     gsap.to(selected, 1, { autoAlpha: 0 });
   }
 
   // Event Listeners
-  hotspots.forEach(function (hotspot) {
+
+  // Load materials on init
+  loadMaterialInfo();
+
+  // Hotspot event listeners
+  hotspots.forEach(hotspot => {
     hotspot.addEventListener("mouseenter", showInfo);
     hotspot.addEventListener("mouseleave", hideInfo);
   });
-
-  // Initialize
-  loadInfoBoxes();
-  loadMaterialInfo();
 
 })();
 
