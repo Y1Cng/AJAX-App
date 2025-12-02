@@ -16,6 +16,16 @@
 <body>
     <div class="grid-con">
         <div class="col-span-full">
+            <!-- 移动端显示的静态图片 -->
+            <img id="mobile-tablet-view" src="images/poster.webp" alt="Earbuds Model">
+
+            <!-- Loading 加载动画容器 -->
+            <div id="loader" class="hidden">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="#333" stroke-width="10" fill="none" />
+                </svg>
+            </div>
+
             <model-viewer id="model" src="model/earbuds.gltf" camera-controls poster="images/poster.webp"
                 shadow-intensity="1" environment-image="images/aircraft_workshop_01_1k.hdr" exposure="1.7"
                 camera-orbit="52.34deg 88.29deg 874.8m" field-of-view="30deg">
